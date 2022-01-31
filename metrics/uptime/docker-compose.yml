@@ -1,0 +1,24 @@
+version: '3.5'
+
+volumes:
+  uptime-kuma:
+    driver: local
+    
+networks:
+  proxy:
+    external: true
+
+services:
+  app:
+    image: louislam/uptime-kuma
+    restart: always
+    volumes:
+      - uptime-kuma:/app/data
+    networks:
+      - proxy
+    labels:
+      - traefik.http.routers.uptime.rule=Host(`uptime.$DOMAIN`)
+      - traefik.http.routers.uptime.tls=true
+      - traefik.http.routers.uptime.tls.certresolver=lets-encrypt
+      - traefik.port=3001
+

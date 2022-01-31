@@ -1,0 +1,19 @@
+version: "3.7"
+
+networks:
+  proxy:
+    external: true
+
+services:
+  proxy:
+    image: traefik:v2.2
+    volumes:
+      - ./traefik.toml:/traefik.toml
+      - ./traefik_dynamic.toml:/traefik_dynamic.toml
+      - ./acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 443:443
+      - 80:80
+    networks:
+      - proxy
