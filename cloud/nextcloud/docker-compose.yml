@@ -76,9 +76,15 @@ services:
       - frontend
     labels:
       - traefik.http.routers.cloud.rule=Host(`cloud.$DOMAIN`)
+      - traefik.http.routers.cloud.middlewares=nextcloud-caldav@docker
       - traefik.http.routers.cloud.tls=true
       - traefik.http.routers.cloud.tls.certresolver=lets-encrypt
       - traefik.port=80
+      - traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true
+      - traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav
+      - traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/
+      - traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https
+      - traefik.http.routers.nextcloud-http.middlewares=nextcloud-https@docker
 
   cron:
     image: nextcloud:fpm-alpine
