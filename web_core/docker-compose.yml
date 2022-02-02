@@ -1,0 +1,42 @@
+version: "3.7"
+
+networks:
+  proxy:
+    external: true
+
+services:
+  traefik:
+    image: traefik:v2.6
+    volumes:
+      - ./config/:/etc/traefik
+    ports:
+      - 443:443
+      - 80:80
+    networks:
+      - proxy
+    environment:
+      DOCKER_HOST: dockersocket
+      CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
+    secrets:
+      - cf_dns_api_token
+    labels:
+      traefik.http.routers.api.rule: Host(`traefik.$DOMAIN`)    # Define the subdomain for the traefik dashboard.
+      traefik.http.routers.api.entryPoints: https    # Set the Traefik entry point.
+      traefik.http.routers.api.service: api@internal    # Enable Traefik API.
+      traefik.enable: true   # Enable Traefik reverse proxy for the Traefik dashboard.
+
+  dockersocket:
+    image: tecnativa/docker-socket-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy
+    environment:
+      CONTAINERS: 1
+      POST: 0
+    privileged: true
+    restart: unless-stopped
+
+secrets:
+  cf_dns_api_token:
+    file: ./secrets/cloudflare_token.secret
