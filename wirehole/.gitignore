@@ -1,2 +1,3 @@
 unbound/
 wireguard/
+.env

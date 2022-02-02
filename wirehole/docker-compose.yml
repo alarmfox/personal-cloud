@@ -21,7 +21,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Rome
-      - SERVERURL=wireguard.capass.codes #optional
+      - SERVERURL=wireguard.$DOMAIN #optional
       - SERVERPORT=51820 #optional
       - PEERS=pc,laptop,smartphone,tablet #optional
       - PEERDNS=auto #optional

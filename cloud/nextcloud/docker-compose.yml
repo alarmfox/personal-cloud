@@ -75,17 +75,15 @@ services:
       - proxy
       - frontend
     labels:
+      - traefik.enable=true
       - traefik.http.routers.cloud.rule=Host(`cloud.$DOMAIN`)
       - traefik.http.routers.cloud.middlewares=nextcloud-caldav@docker
-      - traefik.http.routers.cloud.tls=true
-      - traefik.http.routers.cloud.tls.certresolver=lets-encrypt
-      - traefik.port=80
       - traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true
       - traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav
       - traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/
       - traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https
       - traefik.http.routers.nextcloud-http.middlewares=nextcloud-https@docker
-
+      - traefik.http.routers.cloud.entryPoints=https
   cron:
     image: nextcloud:fpm-alpine
     restart: always
@@ -100,12 +98,12 @@ services:
 
 secrets:
   nextcloud_admin_password:
-    file: ./nextcloud_admin_password.txt 
+    file: ./secrets/nextcloud_admin_password.secret 
   nextcloud_admin_user:
-    file: ./nextcloud_admin_user.txt 
+    file: ./secrets/nextcloud_admin_user.secret 
   postgres_db:
-    file: ./postgres_db.txt
+    file: ./secrets/postgres_db.secret
   postgres_password:
-    file: ./postgres_password.txt 
+    file: ./secrets/postgres_password.secret 
   postgres_user:
-    file: ./postgres_user.txt
+    file: ./secrets/postgres_user.secret
