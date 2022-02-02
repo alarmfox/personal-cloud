@@ -1,0 +1,43 @@
+version: '3.3'
+
+networks:
+  proxy:
+    external: true
+
+services:
+  auth:
+    image: authelia/authelia
+    volumes:
+      - ./authelia:/config
+    networks:
+      - proxy
+    labels:
+      traefik.enable: true
+      traefik.http.routers.authelia.rule: Host(`authelia.$DOMAIN`)
+      traefik.http.routers.authelia.entrypoints: https
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Rome
+      - AUTHELIA_JWT_SECRET_FILE=/run/secrets/jwt
+      - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/session
+      - AUTHELIA_SESSION_REDIS_PASSWORD_FILE:/run/secrets/redis
+    secrets:
+      - jwt
+      - session
+      - redis
+
+  redis:
+    image: redis:alpine
+    networks:
+      - proxy
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Rome
+
+secrets:
+  jwt:
+    file: ./secrets/jwt.secret
+  session:
+    file: ./secrets/session.secret
+  redis:
+    file: ./secrets/redis.secret
