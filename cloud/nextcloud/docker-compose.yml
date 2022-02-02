@@ -75,15 +75,16 @@ services:
       - proxy
       - frontend
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.cloud.rule=Host(`cloud.$DOMAIN`)
-      - traefik.http.routers.cloud.middlewares=nextcloud-caldav@docker
-      - traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true
-      - traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav
-      - traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$${1}/remote.php/dav/
-      - traefik.http.middlewares.nextcloud-https.redirectscheme.scheme=https
-      - traefik.http.routers.nextcloud-http.middlewares=nextcloud-https@docker
-      - traefik.http.routers.cloud.entryPoints=https
+      traefik.enable: true
+      traefik.http.routers.cloud.entryPoints: https
+      traefik.http.routers.cloud.rule: Host(`cloud.$DOMAIN`)
+      traefik.http.routers.cloud.middlewares: nextcloud-caldav@docker
+
+      # middleware definition
+      traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent: true
+      traefik.http.middlewares.nextcloud-caldav.redirectregex.regex: ^https://(.*)/.well-known/(card|cal)dav
+      traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement: https://$${1}/remote.php/dav/
+
   cron:
     image: nextcloud:fpm-alpine
     restart: always
