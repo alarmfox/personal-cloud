@@ -24,6 +24,8 @@ services:
       traefik.http.routers.api.entryPoints: https    # Set the Traefik entry point.
       traefik.http.routers.api.service: api@internal    # Enable Traefik API.
       traefik.enable: true   # Enable Traefik reverse proxy for the Traefik dashboard.
+      traefik.http.routers.api.middlewares: traefik-auth
+      traefik.http.middlewares.traefik-auth.basicauth.users: "admin:$$apr1$$l7vyRSK.$$1qQM5BDYeo14/q/sK/tB2."
 
   dockersocket:
     image: tecnativa/docker-socket-proxy
