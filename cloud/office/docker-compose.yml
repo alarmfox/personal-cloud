@@ -32,14 +32,13 @@ services:
       - doc_logs:/var/log/onlyoffice
       - doc_cache:/var/lib/onlyoffice
     labels:
-      - traefik.http.routers.office.rule=Host(`office.$DOMAIN`)
-      - traefik.http.routers.office.tls=true
-      - traefik.http.routers.office.tls.certresolver=lets-encrypt
-      - traefik.port=80
-      - traefik.http.routers.office-secure.middlewares=secure-headers
-      - traefik.http.middlewares.secure-headers.headers.customrequestheaders.X-Forwarded-Proto=https
-      - traefik.http.middlewares.cors-headers.headers.accessControlAllowOrigin=*
-      - traefik.http.routers.office.middlewares=secure-headers,cors-headers
+      traefik.enable: true
+      traefik.http.routers.office.rule: Host(`office.$DOMAIN`)
+      traefik.http.routers.office.entryPoints: https
+      traefik.http.routers.office.middlewares: secure-headers
+
+      # middleware definition
+      traefik.http.middlewares.secure-headers.headers.customrequestheaders.X-Forwarded-Proto: https
 
   redis:
     image: redis:alpine
