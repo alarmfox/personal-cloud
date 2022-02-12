@@ -14,6 +14,7 @@ services:
       - 80:80
     networks:
       - proxy
+      - default
     environment:
       DOCKER_HOST: dockersocket
       CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
@@ -32,7 +33,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - proxy
+      - default
     environment:
       CONTAINERS: 1
       POST: 0
