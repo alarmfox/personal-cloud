@@ -1,0 +1,33 @@
+version: '3.3'
+
+networks:
+  proxy:
+    external: true
+
+services:
+  app:
+    image: collabora/code 
+    restart: always
+    networks:
+      - proxy
+      - default
+    environment:
+      - domain=cloud\\.capass\\.org
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true
+      - TZ=Europe/Rome
+      - aliasgroup1=https://cloud.capass.org
+      - dictionaries=it_IT
+    labels:
+      traefik.enable: true
+      traefik.http.routers.collabora.entryPoints: https
+      traefik.http.routers.collabora.tls: true
+      traefik.http.routers.collabora.rule: Host(`collabora.capass.org`)
+      traefik.http.routers.collabora.middlewares: collabora-header
+      traefik.http.services.collabora.loadbalancer.server.port: 9980
+      traefik.http.middlewares.collabora-header.headers.referrerPolicy: no-referrer
+      traefik.http.middlewares.collabora-header.headers.stsSeconds: 15552000
+      traefik.http.middlewares.collabora-header.headers.forceSTSHeader: true
+      traefik.http.middlewares.collabora-header.headers.stsPreload: true
+      traefik.http.middlewares.collabora-header.headers.stsIncludeSubdomains: true
+      traefik.http.middlewares.collabora-header.headers.browserXssFilter: true
+      traefik.http.middlewares.collabora-header.headers.customRequestHeaders.X-Forwarded-Proto: https
