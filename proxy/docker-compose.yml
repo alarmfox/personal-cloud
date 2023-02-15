@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.3"
 
 networks:
   proxy:
@@ -8,7 +8,7 @@ services:
   traefik:
     image: traefik:v2.6
     volumes:
-      - ./config/:/etc/traefik
+      - ./traefik/:/etc/traefik
     ports:
       - 443:443
       - 80:80
@@ -16,17 +16,27 @@ services:
       - proxy
       - default
     environment:
-      DOCKER_HOST: dockersocket
       CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
+      CF_API_EMAIL: capassog97@gmail.com
     secrets:
       - cf_dns_api_token
     labels:
-      traefik.http.routers.api.rule: Host(`traefik.$DOMAIN`)    # Define the subdomain for the traefik dashboard.
-      traefik.http.routers.api.entryPoints: https    # Set the Traefik entry point.
-      traefik.http.routers.api.service: api@internal    # Enable Traefik API.
-      traefik.enable: true   # Enable Traefik reverse proxy for the Traefik dashboard.
-      traefik.http.routers.api.middlewares: traefik-auth
-      traefik.http.middlewares.traefik-auth.basicauth.users: "admin:$$apr1$$l7vyRSK.$$1qQM5BDYeo14/q/sK/tB2."
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.capass.org`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.usersfile=/etc/traefik/users"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.capass.org`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=capass.org"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.capass.org"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
 
   dockersocket:
     image: tecnativa/docker-socket-proxy
@@ -42,4 +52,4 @@ services:
 
 secrets:
   cf_dns_api_token:
-    file: ./secrets/cloudflare_token.secret
+    file: ../secrets/cloudflare_token.secret
