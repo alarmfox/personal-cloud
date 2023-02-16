@@ -6,17 +6,21 @@ networks:
 
 services:
   app:
-    image: collabora/code 
+    image: collabora/code:22.05.10.1.1
     restart: always
     networks:
       - proxy
       - default
     environment:
-      - domain=cloud\\.capass\\.org
-      - extra_params=--o:ssl.enable=false --o:ssl.termination=true
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post\_allow.host\[0\]=web
       - TZ=Europe/Rome
       - aliasgroup1=https://cloud.capass.org
       - dictionaries=it_IT
+      - DONT_GEN_SSL_CERT=1
+      - server_name=collabora.capass.org
+      - username=admin
+      - password=collabora
+      - domain=web
     labels:
       traefik.enable: true
       traefik.http.routers.collabora.entryPoints: https
