@@ -1,0 +1,22 @@
+version: '3.3'
+
+networks:
+  proxy:
+    external: true
+  backend:
+    external: true
+
+services:
+   sad:
+    image: capas/game-repository:latest
+    volumes:
+      - ./config.json:/app/config.json
+    networks:
+      - proxy
+      - backend
+    labels:
+      traefik.enable: true
+      traefik.http.routers.sad.entryPoints: https
+      traefik.http.routers.sad.tls: true
+      traefik.http.routers.sad.rule: Host(`sad.capass.org`)
+      traefik.http.services.sad.loadbalancer.server.port: 3000

@@ -19,7 +19,7 @@ services:
       - DONT_GEN_SSL_CERT=1
       - server_name=collabora.capass.org
       - username=admin
-      - password=collabora
+      - password=
       - domain=web
     labels:
       traefik.enable: true
