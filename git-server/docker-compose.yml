@@ -1,7 +1,23 @@
 version: '3'
 
+networks:
+  proxy:
+    external: true
+
+# volumes:
+#   git-data:
+#     external: true
 
 services:
   git:
-    build: .
-
+    build:
+      context: .
+      args:
+        - "GIT_USER_UID=1000"
+        - "GIT_USER_GID=1000"
+    volumes:
+      - ./projects:/projects
+      - ./sshd_config:/etc/ssh/sshd_config
+      - ./authorized_keys:/home/git/.ssh/authorized_keys
+    ports:
+      - 4444:22
