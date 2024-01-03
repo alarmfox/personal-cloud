@@ -1,0 +1,46 @@
+#
+# cgit config
+# see cgitrc(5) for details
+
+css=/cgit-css/cgit.css
+logo=/cgit-css/cgit.png
+favicon=/cgit-css/favicon.ico
+
+virtual-root=/
+max-repodesc-length=100
+repository-sort=age
+
+root-title=Giuseppe's git repositories
+root-desc=Public repos for some of my projects, and mirrors of other projects.
+
+# Possible readme files for about page
+readme=:README.md
+readme=:README.txt
+readme=:README.rst
+readme=:README
+
+# Syntax highlighting
+source-filter=/usr/local/lib/cgit/filters/syntax-highlighting.py
+
+# About page rendering script
+about-filter=/usr/local/lib/cgit/filters/about-formatting.sh
+
+# Some common mimetypes for serving files raw
+mimetype.gif=image/gif
+mimetype.html=text/html
+mimetype.jpg=image/jpeg
+mimetype.jpeg=image/jpeg
+mimetype.pdf=application/pdf
+mimetype.png=image/png
+mimetype.svg=image/svg+xml
+
+# Set of snapshot formats for people to download
+snapshots=tar.gz zip
+
+# Git configuration
+enable-http-clone=0
+enable-commit-graph=1
+remove-suffix=1
+section-from-path=1
+scan-path=/home/git/public
+scan-hidden-path=0

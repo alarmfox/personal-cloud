@@ -1,0 +1,28 @@
+version: '3'
+
+networks:
+  proxy:
+    external: true
+
+# volumes:
+#   git-data:
+#     external: true
+
+services:
+  git:
+    build:
+      context: git-server/
+    volumes:
+      - ./projects:/projects
+      - ./git-server/sshd_config:/etc/ssh/sshd_config
+      - ./git-server/authorized_keys:/git/.ssh/authorized_keys
+    ports:
+      - 4444:22
+  web:
+    build:
+      context: web/
+    ports:
+      - "8080:80"
+    volumes:
+      - ./projects:/home/git/public:ro
+      - ./web/cgit.css:/usr/share/cgit/cgit.css:ro
