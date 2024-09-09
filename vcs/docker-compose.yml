@@ -1,13 +1,11 @@
+---
 version: '3'
-
 networks:
   proxy:
     external: true
-
 volumes:
   git-data:
     external: true
-
 services:
   git:
     build:
@@ -22,10 +20,11 @@ services:
     build:
       context: web/
     ports:
-      - "8080:80"
+      - 8080:80
     volumes:
       - git-data:/home/git/public:ro
       - ./web/cgit.css:/usr/share/cgit/cgit.css:ro
+      - ./web/cgitrc:/etc/cgitrc:ro
     labels:
       traefik.enable: true
       traefik.http.routers.git.entryPoints: https
