@@ -5,6 +5,7 @@
 css=/cgit-css/cgit.css
 logo=/cgit-css/cgit.png
 favicon=/cgit-css/favicon.ico
+head-include=/usr/lib/cgit/head_include.html
 
 virtual-root=/
 max-repodesc-length=100
@@ -20,10 +21,10 @@ readme=:README.rst
 readme=:README
 
 # Syntax highlighting
-source-filter=/usr/local/lib/cgit/filters/syntax-highlighting.py
+source-filter=/usr/lib/cgit/filters/syntax-highlighting.py
 
 # About page rendering script
-about-filter=/usr/local/lib/cgit/filters/about-formatting.sh
+about-filter=/usr/lib/cgit/filters/about-formatting.sh
 
 # Some common mimetypes for serving files raw
 mimetype.gif=image/gif
@@ -38,7 +39,7 @@ mimetype.svg=image/svg+xml
 snapshots=tar.gz zip
 
 # Git configuration
-enable-http-clone=0
+enable-http-clone=1
 enable-commit-graph=1
 remove-suffix=1
 section-from-path=1
