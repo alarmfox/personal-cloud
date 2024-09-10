@@ -1,7 +1,0 @@
-{
-    "postgresUrl": "postgres://<user>:<password>@postgresql:5432/sad?sslmode=disable",
-    "listenAddress": "0.0.0.0:3000",
-    "apiPrefix": "/",
-    "dataDir": "data",
-    "enableSwagger": true
-}
