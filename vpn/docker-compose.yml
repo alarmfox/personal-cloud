@@ -1,0 +1,70 @@
+---
+services:
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SERVERURL=135.181.31.189 #optional
+      - SERVERPORT=51820 #optional
+      - PEERS=1 #optional
+      - PEERDNS=auto #optional
+      - INTERNAL_SUBNET=10.13.13.0 #optional
+      - ALLOWEDIPS=0.0.0.0/0 #optional
+      - PERSISTENTKEEPALIVE_PEERS= #optional
+      - LOG_CONFS=true #optional
+    volumes:
+      - ./config:/config
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    dns:
+      - 172.25.0.7
+    networks:
+      containers:
+        ipv4_address: 172.25.0.5
+      default:
+
+  pihole:
+    image: pihole/pihole:latest
+    expose:
+      - 53
+      - 67
+      - 80
+      - 443
+    ports:
+      - 8080:80
+    environment:
+      - TZ=Europe/Rome
+      - WEBPASSWORD=G/!;Ve@`g]t++Mey*-67Ku,zG
+    volumes:
+      - ./etc-pihole/:/etc/pihole/
+      - ./etc-dnsmasq.d/:/etc/dnsmasq.d/
+    networks:
+      containers:
+        ipv4_address: 172.25.0.7
+      proxy:
+    labels:
+      traefik.enable: true
+      traefik.http.routers.pihole.entryPoints: https
+      traefik.http.routers.pihole.tls: true
+      traefik.http.routers.pihole.rule: Host(`pihole.capass.org`) 
+      traefik.http.routers.pihole.middlewares: pihole-redirectregex@docker,pihole-addprefix@docker
+      traefik.http.services.pihole.loadBalancer.server.port: 80
+      # middleware definition
+      traefik.http.middlewares.pihole-addprefix.addPrefix.prefix: /admin
+      traefik.http.middlewares.pihole-redirectregex.redirectRegex.regex: /admin/$
+      traefik.http.middlewares.pihole-redirectregex.redirectRegex.replacement: /
+
+networks:
+  containers:
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+  proxy:
+    external: true
