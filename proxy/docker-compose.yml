@@ -2,9 +2,12 @@
 networks:
   proxy:
     external: true
+volumes:
+  certs:
+    external: true
 services:
   traefik:
-    image: traefik:v2.6
+    image: traefik:v2.7
     volumes:
       - ./traefik/:/etc/traefik
     ports:
@@ -45,7 +48,16 @@ services:
       POST: 0
     privileged: true
     restart: unless-stopped
+  traefik-certs-dumper:
+    image: ldez/traefik-certs-dumper:v2.8.1
+    entrypoint: sh -c ' apk add jq ; while ! [ -e /data/acme.json ] || ! [ `jq ".[]
+      | .Certificates | length" /data/acme.json` != 0 ]; do sleep 1 ; done && traefik-certs-dumper
+      file --version v2 --watch --source /data/acme.json --dest /data/certs'
+    volumes:
+      - certs:/data/certs
+      - ./traefik/acme.json:/data/acme.json:ro
+    networks:
+      - default
 secrets:
   cf_dns_api_token:
     file: ../secrets/cloudflare_token.secret
-
