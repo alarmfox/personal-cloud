@@ -1,6 +1,7 @@
 #!/bin/bash
 
-BASE_PATH=/git/projects
+#BASE_PATH=/git/projects
+BASE_PATH=/mnt/git
 
 die () { echo "error:" $1 1>&2; exit 1; }
 
@@ -38,7 +39,7 @@ delete_repo() {
     die "reponame is required."
   fi
   printf "Are you sure? (Y/N): "
-  read -p  confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+  read -r  confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
   rm -r $BASE_PATH/$1.git
 }

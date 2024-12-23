@@ -19,6 +19,8 @@ RUN mkdir /git/git-shell-commands
 COPY repo.sh /git/git-shell-commands/repo
 RUN chmod +x /git/git-shell-commands/repo
 
+RUN mkdir /git/projects
+RUN mkdir /git/projects/.private
 RUN chown git: /git/ -R
 
 # Remove alpine motd

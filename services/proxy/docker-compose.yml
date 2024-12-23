@@ -1,0 +1,71 @@
+networks:
+  proxy:
+    external: true
+
+volumes:
+  certs:
+    external: true
+
+services:
+  traefik:
+    image: traefik:v2.8
+    volumes:
+      - ./traefik/:/etc/traefik
+    ports:
+      - 443:443
+      - 80:80
+    networks:
+      - proxy
+      - default
+    environment:
+      CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
+      CF_API_EMAIL: capassog97@gmail.com
+    secrets:
+      - cf_dns_api_token
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.capass.org`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.usersfile=/etc/traefik/users"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.capass.org`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=capass.org"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.capass.org"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+  dockersocket:
+    image: tecnativa/docker-socket-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - default
+    environment:
+      CONTAINERS: 1
+      POST: 0
+    privileged: true
+    restart: unless-stopped
+  
+  traefik-certs-dumper:
+    image: ldez/traefik-certs-dumper:v2.8.1
+    entrypoint: sh -c '
+      apk add jq
+      ; while ! [ -e /data/acme.json ]
+      || ! [ `jq ".[] | .Certificates | length" /data/acme.json` != 0 ]; do
+      sleep 1
+      ; done
+      && traefik-certs-dumper file --version v2 --watch
+      --source /data/acme.json --dest /data/certs'
+    volumes:
+      - certs:/data/certs
+      - ./traefik/acme.json:/data/acme.json:ro
+    networks:
+        - default
+secrets:
+  cf_dns_api_token:
+    file: ../secrets/cloudflare_token.secret

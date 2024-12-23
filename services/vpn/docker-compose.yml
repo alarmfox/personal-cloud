@@ -9,14 +9,14 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - SERVERURL=  # optional
-      - SERVERPORT=  # optional
-      - PEERS=1  # optional
-      - PEERDNS=auto  # optional
-      - INTERNAL_SUBNET=10.13.13.0  # optional
-      - ALLOWEDIPS=0.0.0.0/0  # optional
-      - PERSISTENTKEEPALIVE_PEERS=  # optional
-      - LOG_CONFS=true  # optional
+      - SERVERURL=
+      - SERVERPORT=#optional
+      - PEERS=1 #optional
+      - PEERDNS=auto #optional
+      - INTERNAL_SUBNET=10.13.13.0 #optional
+      - ALLOWEDIPS=0.0.0.0/0 #optional
+      - PERSISTENTKEEPALIVE_PEERS= #optional
+      - LOG_CONFS=true #optional
     volumes:
       - ./config:/config
     ports:
@@ -29,6 +29,7 @@ services:
       containers:
         ipv4_address: 172.25.0.5
       default:
+
   pihole:
     image: pihole/pihole:latest
     expose:
@@ -52,13 +53,14 @@ services:
       traefik.enable: true
       traefik.http.routers.pihole.entryPoints: https
       traefik.http.routers.pihole.tls: true
-      traefik.http.routers.pihole.rule: Host(`pihole.capass.org`)
+      traefik.http.routers.pihole.rule: Host(`pihole.capass.org`) 
       traefik.http.routers.pihole.middlewares: pihole-redirectregex@docker,pihole-addprefix@docker
       traefik.http.services.pihole.loadBalancer.server.port: 80
       # middleware definition
       traefik.http.middlewares.pihole-addprefix.addPrefix.prefix: /admin
       traefik.http.middlewares.pihole-redirectregex.redirectRegex.regex: /admin/$
       traefik.http.middlewares.pihole-redirectregex.redirectRegex.replacement: /
+
 networks:
   containers:
     ipam:

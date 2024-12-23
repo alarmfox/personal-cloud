@@ -1,0 +1,15 @@
+networks:
+  proxy:
+    external: true
+services:
+  web:
+    image: my-site
+    labels:
+      traefik.enable: true
+      traefik.http.routers.my-site.entryPoints: https
+      traefik.http.routers.my-site.tls: true
+      traefik.http.routers.my-site.rule: Host(`me.capass.org`)
+    networks:
+      - proxy
+ 
+

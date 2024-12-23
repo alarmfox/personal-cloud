@@ -1,16 +1,17 @@
----
 networks:
   proxy:
     external: true
+
 volumes:
   git-data:
     external: true
+
 services:
   git:
     build:
       context: git-server/
     volumes:
-      - git-data:/projects
+      - git-data:/git/projects
       - ./git-server/sshd_config:/etc/ssh/sshd_config
       - ./git-server/authorized_keys:/git/.ssh/authorized_keys
     ports:
@@ -18,14 +19,16 @@ services:
   web:
     build:
       context: web/
-    ports:
-      - 8080:80
     volumes:
       - git-data:/home/git/public:ro
-      - ./web/cgit.css:/usr/share/cgit/cgit.css:ro
+      - ./web/theme.css:/usr/share/cgit/cgit.css:ro
       - ./web/cgitrc:/etc/cgitrc:ro
     labels:
       traefik.enable: true
       traefik.http.routers.git.entryPoints: https
       traefik.http.routers.git.tls: true
       traefik.http.routers.git.rule: Host(`git.capass.org`)
+    networks:
+      - proxy
+ 
+
